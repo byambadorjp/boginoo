@@ -1,0 +1,21 @@
+@import './variables.scss';
+
+.btn {
+    font-style: normal;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none !important;
+    outline: none !important;
+    border: none !important;
+    border-radius: 100px;
+}
+
+.input {
+    box-sizing: border-box;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.16);
+    border-radius: 100px;
+    text-decoration: none !important;
+    outline: none !important;
+    border: none !important;
+    padding-left: 15px;
+}
