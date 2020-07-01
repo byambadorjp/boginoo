@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeDefault, StyleGuideButton, StyleGuideInput } from './pages';
+import { HomeDefault, Login, StyleGuideButton, StyleGuideInput } from './pages';
 import {
     BrowserRouter as Router,
     Switch,
@@ -15,6 +15,9 @@ const App = () => {
             <Switch>
                 <Route path="/" exact>
                     <HomeDefault />
+                </Route>
+                <Route path="/login">
+                    <Login />
                 </Route>
                 <Route path="/button">
                     <StyleGuideButton />
