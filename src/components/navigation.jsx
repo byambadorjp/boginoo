@@ -1,11 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { Button } from './';
 import { useHistory, useLocation } from 'react-router-dom';
 import { AuthContext } from '../providers/auth-user-provider';
+import { useFirebase } from '../firebase';
 
 export const Navigation = (props) => {
-    const { user, signOut } = useContext(AuthContext);
+    const { ready, user } = useContext(AuthContext);
+    const { auth, firestore } = useFirebase();
+    const [username, setUsername] = useState(null);
 
     let location = useLocation();
     const history = useHistory();
@@ -14,13 +17,25 @@ export const Navigation = (props) => {
         history.push('/login')
     }
 
+    const signOut = async () => {
+        await auth.signOut();
+    }
+
+    useEffect(() => {
+        if (user && firestore){
+            firestore.collection('users').doc(user.uid).get().then((doc) => {
+                setUsername(doc.data().username);
+            })
+        }
+    }, [user, firestore])
+
     return (
         <div className='w100 flex justify-end items-center'>
             <div className='font-ubuntu fs-20 lh-23 bold c-primary'>ХЭРХЭН АЖИЛЛАДАГ ВЭ?</div>
 
             {user && 
                 <>
-                    <div className='font-ubuntu fs-20 lh-23 bold ml-4'>{user.email.split('@')[0]}</div>
+                    <div className='font-ubuntu fs-20 lh-23 bold ml-4'>{username}</div>
                     <Button className='font-ubuntu fs-20 lh-23 bold c-default ml-2 b-primary' onClick={signOut} icon={faSignOutAlt} />
                 </>
             }

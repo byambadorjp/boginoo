@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
 
 var config = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -14,9 +15,13 @@ var config = {
 export const useFirebase = () => {
     let [state, setState] = useState({ firebase });
     useEffect(() => {
-        let app = firebase.initializeApp(config);
+        let app;
+        if (!firebase.apps.length) {
+            app = firebase.initializeApp(config);
+        }
         let auth = firebase.auth(app);
-        setState({ app, auth, firebase });
+        let firestore = firebase.firestore(app);
+        setState({ app, auth, firebase, firestore });
     }, []);
     return state;
 };

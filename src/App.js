@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeDefault, Login, SignUp, StyleGuideButton, StyleGuideInput } from './pages';
+import { HomeDefault, Login, SignUp, StyleGuideButton, StyleGuideInput, Shortener } from './pages';
 import {
     BrowserRouter as Router,
     Switch,
@@ -30,6 +30,7 @@ const App = () => {
                     <Route path="/input">
                         <StyleGuideInput />
                     </Route>
+                    <Route path="*" component={Shortener}/>
                 </Switch>
             </Router>
         </AuthUserProvider>
