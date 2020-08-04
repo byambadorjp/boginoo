@@ -3,31 +3,23 @@ import { Layout, Button, FormInput, Input, IconDash, IconEndBracket, IconStartBr
 import { AuthContext } from '../providers/auth-user-provider';
 import { useHistory } from 'react-router-dom';
 import { useFirebase } from '../firebase';
+import { useInput } from '../hooks/use-input';
 
 export const Login = () => {
     const history = useHistory();
     const { ready, user } = useContext(AuthContext);
     const { auth } = useFirebase();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
-    if (!ready) {
-        return (<Layout>
-            <h1>LOADING...</h1>
-        </Layout>)
-    }
-
-    if (user) {
-        history.push('/')
-    }
+    const [email, bindEmail, resetEmail] = useInput('');
+    const [password, bindPassword, resetPassword] = useInput('');
 
     const navigateToSignUp = () => { history.push('/signup') };
-    const handleChangeEmail = (e) => setEmail(e.target.value);
-    const handleChangePassword = (e) => setPassword(e.target.value);
-
-
     const signIn = async () => {
         await auth.signInWithEmailAndPassword(email, password);
+        resetEmail()
+        resetPassword()
+        //зөвхөн email -ийн утгийг reset хийж үзье
+        history.push('/')
     }
 
     return (
@@ -43,8 +35,10 @@ export const Login = () => {
                         Boginoo
                 </div>
                     <div className='font-ubuntu fs-20 lh-23 bold c-primary'>Нэвтрэх</div>
-                    <FormInput label='Цахим хаяг' type='email' placeholder='name@mail.domain' className='h-5 w-8' value={email} onChange={handleChangeEmail} />
-                    <FormInput label='Нууц үг' type='password' placeholder='password' className='h-5 w-8' value={password} onChange={handleChangePassword} />
+                    <FormInput label='Цахим хаяг' type='email' placeholder='name@mail.domain' className='h-5 w-8' 
+                        {...bindEmail} />
+                    <FormInput label='Нууц үг' type='password' placeholder='password' className='h-5 w-8' 
+                        {...bindPassword} />
 
                     <div className='w-8 flex justify-between items-center'>
                         <div className='font-ubuntu fs-12 c-primary'>Намайг сана</div>

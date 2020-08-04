@@ -19,8 +19,6 @@ export const Shortener = () => {
     }, [firestore]);
 
     return (
-        <Layout>
-            <div>Routing...</div>
-        </Layout>
+        <></>
     )
 }

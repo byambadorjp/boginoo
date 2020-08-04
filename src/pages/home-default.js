@@ -3,40 +3,31 @@ import { Layout, Button, Input, IconDash, IconEndBracket, IconStartBracket, Url 
 import { AuthContext } from '../providers/auth-user-provider';
 import { useFirebase } from '../firebase';
 import randomstring from 'randomstring'
+import { useTimer } from '../hooks/use-timer';
+import { useCollection } from '../hooks/use-collection';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 export const HomeDefault = () => {
-    const [inputUrl, setInputUrl] = useState('');
+    const flag = useTimer(5);
     const { ready, user } = useContext(AuthContext);
+    const { data, createDoc, deleteDoc } = useCollection(`users/${user ? user.uid : 'undefined'}/history`);
+
+    const [inputUrl, setInputUrl] = useState('');
     const { firebase, firestore } = useFirebase();
-    const [recent, setRecent] = useState(null);
 
     const handleChange = (e) => setInputUrl(e.target.value);
 
     const boginoo = () => {
         const shortenedId = randomstring.generate(7);
-        firestore.collection('shortened').doc(shortenedId).set({
+        createDoc(shortenedId, {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             email: user.email,
             inputUrl: inputUrl,
             outputUrl: `https://boginoo.firebaseapp.com/${shortenedId}`
         })
     }
-
-    useEffect(() => {
-        if (user && firestore) {
-            console.log(user.email);
-            firestore.collection('shortened').where("email", "==", user.email)
-                .orderBy("createdAt", "desc")
-                .limit(1)
-                .onSnapshot(function (q) {
-                    q.forEach(function (doc) {
-                        const r = doc.data();
-                        setRecent({inputUrl: r.inputUrl, outputUrl: r.outputUrl});
-                    });
-                });
-        }
-    }, [user, firestore]);
 
     return (
         <Layout>
@@ -46,21 +37,19 @@ export const HomeDefault = () => {
                     <IconDash />
                     <IconEndBracket />
                 </div>
-                <div className='font-lobster c-primary fs-56 lh-70'>
+                {flag && <div className='font-lobster c-primary fs-56 lh-70'>
                     Boginoo
-                </div>
+                </div>}
                 <div className='mt-5 flex justify-center items-center'>
                     <Input className='h-5 w-8' placeholder='https://www.web-huudas.mn' value={inputUrl} onChange={handleChange} />
                     <Button className='font-ubuntu fs-20 lh-23 bold c-default h-5 ph-4 ml-4 b-primary' onClick={boginoo}>Богиносгох</Button>
                 </div>
-
-                {
-                    (user && recent) &&
-                    <div>
-                        <Url type='input' url={recent.inputUrl} />
-                        <Url type='output' url={recent.outputUrl} />
-                    </div>
-                }
+                {data &&
+                    data.filter((item) => item.email === user.email).sort((a,b)=> a.createdAt < b.createdAt ? 1 : -1).map((item) => <div key={item.id} className='mt-4 pa-4 br-primary-2'>
+                        <Url type='input' url={item.inputUrl} />
+                        <Url type='output' url={item.outputUrl} />
+                        <FontAwesomeIcon icon={faTrash} onClick={() => deleteDoc(item.id)}/>
+                    </div>)}
             </div>
         </Layout>
     )
